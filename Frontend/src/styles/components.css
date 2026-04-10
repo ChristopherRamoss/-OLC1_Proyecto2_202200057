@@ -126,7 +126,7 @@
 }
 
 .btn-primary:hover {
-  background-color: #45a049;
+  background-color: #0d4f10;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
 }
@@ -137,7 +137,7 @@
 }
 
 .btn-success:hover {
-  background-color: #0b7dda;
+  background-color: #031376fa;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
 }
@@ -148,11 +148,21 @@
 }
 
 .btn-danger:hover {
-  background-color: #da190b;
+  background-color: #7c0a02;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
 }
 
+.btn-info {
+  background-color: #a105df;
+  color: white;
+}
+
+.btn-info:hover {
+  background-color:  #4e016c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
 
 
 

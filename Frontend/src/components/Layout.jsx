@@ -6,13 +6,6 @@ import Console from './Console';
 import { parserService } from '../services/parserService';
 import '../styles/components.css';
 
-
-
-{/*
-     esto es el layout principal, aqui se va a organizar todo lo que se va a mostrar en la pagina, el editor, la consola 
-     y la salida de errores y resultados
-*/}
-
 export default function Layout() {
   const [code, setCode] = useState('');
   const [output, setOutput] = useState('');
@@ -52,9 +45,14 @@ export default function Layout() {
     setLogs(prev => [...prev, { type: 'info', message: 'Archivo descargado' }]);
   };
 
+  const handleOpen = (fileContent) => {
+    setCode(fileContent);
+    setLogs([{ type: 'success', message: 'Archivo cargado correctamente' }]);
+  };
+
   return (
     <div className="layout-container">
-      <Toolbar onRun={handleRun} onClear={handleClear} onSave={handleSave} />
+      <Toolbar onRun={handleRun} onClear={handleClear} onSave={handleSave} onOpen={handleOpen} />
       
       <div className="main-content">
         <div className="editor-section">
