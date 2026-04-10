@@ -1,5 +1,13 @@
 # -OLC1_Proyecto2_202200057
 
-hola soy una modificacion
+usar gitbash en la terminal para ejecutar instalacion.sh
+Instalacion en gitbash:                                     ./instalacion.sh
 
-hola sigo modificando
+
+generador
+Desde gitbash       ./generador.sh
+
+Test (Desde gitbash)
+cd Backend 
+cd Test
+node Test.js
