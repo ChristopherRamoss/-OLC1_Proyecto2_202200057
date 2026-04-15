@@ -1,2 +1,33 @@
-123 45.67 89 0.5 100
-80  200 3.3
+var globalX int = 100;
+var sistema string = "Activo";
+
+func main() {
+    var a int = 10;
+    var b int = 20;
+    
+    // Prueba de aritmética y agrupación
+    resultado := (a + b) * 2;
+
+    // Prueba de IF con punto y coma final (como pide tu gramática)
+    if resultado > 50 {
+        fmt.Println("Es mayor");
+    };
+
+    // Prueba de FOR estilo while con punto y coma final
+    for a < 15 {
+        fmt.Print("Ciclo");
+        a = a + 1;
+    };
+
+    // Bloque independiente (Scope)
+    {
+        var local string = "test";
+        fmt.Println(local);
+    }
+
+    fmt.Println("Fin del test");
+}
+
+func suma(n1 int, n2 int) int {
+    return n1 + n2;
+}
