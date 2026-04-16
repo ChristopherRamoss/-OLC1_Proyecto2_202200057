@@ -1,33 +1,18 @@
-var globalX int = 100;
-var sistema string = "Activo";
+var x int = 50
+var y int = 100; // Con punto y coma funciona
 
 func main() {
-    var a int = 10;
-    var b int = 20;
+    i := 10
     
-    // Prueba de aritmética y agrupación
-    resultado := (a + b) * 2;
-
-    // Prueba de IF con punto y coma final (como pide tu gramática)
-    if resultado > 50 {
-        fmt.Println("Es mayor");
-    };
-
-    // Prueba de FOR estilo while con punto y coma final
-    for a < 15 {
-        fmt.Print("Ciclo");
-        a = a + 1;
-    };
-
-    // Bloque independiente (Scope)
+    // Bloque independiente (4.1)
     {
-        var local string = "test";
-        fmt.Println(local);
+        i := 20
+        fmt.Println(i)
     }
 
-    fmt.Println("Fin del test");
-}
+    if i < 100 {
+        fmt.Println("Opcional working")
+    }
 
-func suma(n1 int, n2 int) int {
-    return n1 + n2;
+    fmt.Println(x)
 }

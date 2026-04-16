@@ -17,6 +17,9 @@
 
 /* ── Espacios en blanco ─────────────────────────────────── */
 \s+                         /* ignorar espacios, tabs, saltos de línea */
+[ \t\r]+            /* ignorar espacios y tabs */
+\n+                 return 'NL'; // Ahora el enter es un token
+";"                 return 'SEMICOLON';
 
 /* ── Comentarios ────────────────────────────────────────── */
 "//"[^\n]*                  /* comentario de una línea — ignorar */
@@ -170,11 +173,18 @@ declaraciones_globales
     | /* vacío */                               { $$ = []; }
     ;
 
+terminador
+    : SEMICOLON
+    | NL
+    ;
+
+
 declaracion_global
-    : decl_variable SEMICOLON   { $$ = $1; }
-    | decl_constante SEMICOLON  { $$ = $1; }
+    : decl_variable terminador   { $$ = $1; }
+    | decl_constante terminador  { $$ = $1; }
     | decl_funcion              { $$ = $1; }
-    | func_main                 { $$ = $1; } // Ahora es una global más
+    | func_main                 { $$ = $1; }
+    | NL                        { $$ = null; } // Ignorar líneas vacías globales
     ;
 
 /* ── Declaración de variables ───────────────────────────────
@@ -240,16 +250,18 @@ bloque
     ;
 
 sentencias
-    : sentencias sentencia_bloque  { $$ = $1; $1.push($2); }
-    | /* vacío */                   { $$ = []; }
+    : sentencias sentencia_bloque { if($2) $1.push($2); $$ = $1; }
+    | /* vacío */                 { $$ = []; }
     ;
 
 /* Una sentencia dentro de un bloque puede ser:
    - una sentencia normal terminada en ;
    - un bloque independiente anidado { ... }  (4.1)         */
+
 sentencia_bloque
-    : sentencia SEMICOLON          { $$ = $1; }
-    | bloque                       { $$ = $1; }   /* bloque independiente anidado */
+    : sentencia terminador   { $$ = $1; }
+    | bloque                { $$ = $1; } // Bloque independiente (4.1) sin terminador
+    | NL                    { $$ = null; } // Ignorar líneas vacías internas
     ;
 
 /* ── Sentencias ─────────────────────────────────────────── */
@@ -403,3 +415,7 @@ expresion
     ;
 
 %%
+
+
+
+//modificar
