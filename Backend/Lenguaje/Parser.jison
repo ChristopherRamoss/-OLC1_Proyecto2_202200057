@@ -183,6 +183,7 @@ declaracion_global
     | decl_funcion              { $$ = $1; }
     | func_main                 { $$ = $1; }
     | NL                        { $$ = null; } // Ignorar líneas vacías globales
+    | error terminador           { $$ = null; } // <--- RECUPERACIÓN GLOBAL
     ;
 
 /* ── Declaración de variables ───────────────────────────────
@@ -191,13 +192,53 @@ declaracion_global
    Forma 3 (implícita, inferencia):        nombre := expr       */
 decl_variable
     : VAR ID tipo ASSIGN expresion
-        { $$ = { tipo: 'decl_var', forma: 'explicita_valor',   nombre: $2, tipoDato: $3, valor: $5 }; }
+        { 
+            require('../Util/TablaSimbolos').listaSimbolos.push({
+                id: $2, 
+                tipoSimbolo: 'Variable', 
+                tipoDato: $3, 
+                ambito: 'Global',
+                linea: yylineno + 1, 
+                columna: @2.first_column // <--- CAMBIA ESTO
+            });
+            $$ = { tipo: 'decl_var', forma: 'explicita_valor', nombre: $2, tipoDato: $3, valor: $5 }; 
+        }
     | VAR ID tipo
-        { $$ = { tipo: 'decl_var', forma: 'explicita_sin_valor', nombre: $2, tipoDato: $3, valor: null }; }
+        { 
+            require('../Util/TablaSimbolos').listaSimbolos.push({
+                id: $2, 
+                tipoSimbolo: 'Variable', 
+                tipoDato: $3, 
+                ambito: 'Global',
+                linea: yylineno + 1, 
+                columna: @2.first_column // <--- CAMBIA ESTO
+            });
+            $$ = { tipo: 'decl_var', forma: 'explicita_sin_valor', nombre: $2, tipoDato: $3, valor: null }; 
+        }
     | VAR ID ASSIGN expresion
-        { $$ = { tipo: 'decl_var', forma: 'explicita_valor',   nombre: $2, tipoDato: null, valor: $4 }; }
+        { 
+            require('../Util/TablaSimbolos').listaSimbolos.push({
+                id: $2, 
+                tipoSimbolo: 'Variable', 
+                tipoDato: 'inferido', 
+                ambito: 'Global',
+                linea: yylineno + 1, 
+                columna: @2.first_column // <--- CAMBIA ESTO
+            });
+            $$ = { tipo: 'decl_var', forma: 'explicita_valor', nombre: $2, tipoDato: null, valor: $4 }; 
+        }
     | ID DECL_ASSIGN expresion
-        { $$ = { tipo: 'decl_var', forma: 'implicita',         nombre: $1, tipoDato: null, valor: $3 }; }
+        { 
+            require('../Util/TablaSimbolos').listaSimbolos.push({
+                id: $1, 
+                tipoSimbolo: 'Variable', 
+                tipoDato: 'inferido', 
+                ambito: 'Local',
+                linea: yylineno + 1, 
+                columna: @1.first_column // <--- AQUÍ ES @1 porque ID es el primer elemento
+            });
+            $$ = { tipo: 'decl_var', forma: 'implicita', nombre: $1, tipoDato: null, valor: $3 }; 
+        }
     ;
 
 /* ── Declaración de constantes ──────────────────────────── */
@@ -260,6 +301,7 @@ sentencia_bloque
     : sentencia terminador   { $$ = $1; }
     | bloque                { $$ = $1; } // Bloque independiente (4.1) sin terminador
     | NL                    { $$ = null; } // Ignorar líneas vacías internas
+    | error terminador       { $$ = null; } // <--- RECUPERACIÓN LOCAL
     ;
 
 /* ── Sentencias ─────────────────────────────────────────── */
@@ -416,7 +458,7 @@ expresion
 
 
 
-// ... al final del archivo para errores sintácticos ...
+// Al final del archivo .jison
 parser.parseError = function(str, hash) {
     agregarError("Sintáctico", `Error recuperable: ${str}`, hash.line, hash.loc.first_column);
 };

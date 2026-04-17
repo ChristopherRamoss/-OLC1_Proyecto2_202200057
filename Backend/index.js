@@ -11,16 +11,15 @@ app.use(express.json()); // Permite leer JSON en las peticiones
 
 // RUTA PARA ANALIZAR
 app.post('/analizar', (req, res) => {
-    const { codigo } = req.body;
-    limpiarErrores(); 
-    // Aquí podrías limpiar también la lista de símbolos
-    
     try {
-        const ast = parser.parse(codigo);
-        // IMPORTANTE: Aquí recorrerás el AST después para llenar listaSimbolos
-        res.json({ mensaje: "Análisis finalizado", ast, errores: listaErrores });
+        console.log("Iniciando análisis...");
+        const ast = parser.parse(req.body.codigo);
+        console.log("Análisis terminado con éxito");
+        res.json({ ast, errores: listaErrores });
     } catch (e) {
-        res.status(400).json({ mensaje: "Error fatal", error: e.message, errores: listaErrores });
+        console.log("¡ERROR DETECTADO!");
+        console.log(e.stack); // Esto te dirá exactamente en qué línea de qué archivo falló
+        res.status(500).json({ mensaje: "Error fatal", detalle: e.message });
     }
 });
 

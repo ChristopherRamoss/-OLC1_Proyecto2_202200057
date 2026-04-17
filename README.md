@@ -12,4 +12,6 @@ cd Backend
 cd Test
 node Test.js
 
-
+cd Backend 
+node index.js
+## EXITO        🚀 Servidor Backend en http://localhost:4000
