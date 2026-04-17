@@ -12,19 +12,58 @@ export default function Layout() {
   const [errors, setErrors] = useState('');
   const [logs, setLogs] = useState([]);
 
+  // --- NUEVA LÓGICA DE EJECUCIÓN (CONEXIÓN AL BACKEND) ---
   const handleRun = async () => {
-    setLogs([{ type: 'info', message: 'Ejecutando código...' }]);
+    setLogs([{ type: 'info', message: 'Ejecutando código en servidor...' }]);
     setOutput('');
     setErrors('');
 
     try {
-      const result = await parserService.parseCode(code);
-      setOutput(JSON.stringify(result, null, 2));
-      setLogs(prev => [...prev, { type: 'success', message: 'Ejecución exitosa' }]);
+      // 1. Enviamos el código al backend para análisis y reporte
+      const response = await fetch('http://localhost:4000/analizar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigo: code })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Mostramos el AST en el panel de salida
+        setOutput(JSON.stringify(result.ast, null, 2));
+        
+        if (result.errores && result.errores.length > 0) {
+          setLogs(prev => [...prev, { type: 'error', message: `Análisis con ${result.errores.length} errores. Revisa el reporte.` }]);
+        } else {
+          setLogs(prev => [...prev, { type: 'success', message: 'Ejecución exitosa' }]);
+        }
+      } else {
+        throw new Error(result.mensaje || 'Error en el servidor');
+      }
     } catch (error) {
       setErrors(error.message);
-      setLogs(prev => [...prev, { type: 'error', message: error.message }]);
+      setLogs(prev => [...prev, { type: 'error', message: `Error de conexión: ${error.message}` }]);
     }
+  };
+
+  // --- NUEVA FUNCIÓN PARA REPORTES ---
+    const handleReport = () => {
+        // Abrimos ambas rutas en pestañas nuevas
+        window.open('http://localhost:4000/reporte-errores', '_blank');
+        
+        // El pequeño delay evita que el navegador bloquee la segunda pestaña
+        setTimeout(() => {
+            window.open('http://localhost:4000/reporte-tabla', '_blank');
+        }, 500);
+    };
+
+    // Dentro de tu componente Layout
+  const verErrores = () => {
+      window.open('http://localhost:4000/reporte-errores', '_blank');
+  };
+
+  const verSimbolos = () => {
+      window.open('http://localhost:4000/reporte-tabla', '_blank');
   };
 
   const handleClear = () => {
@@ -52,7 +91,16 @@ export default function Layout() {
 
   return (
     <div className="layout-container">
-      <Toolbar onRun={handleRun} onClear={handleClear} onSave={handleSave} onOpen={handleOpen} />
+      {/* Agregamos handleReport aquí */}
+      <Toolbar 
+        onRun={handleRun} 
+        onClear={handleClear} 
+        onSave={handleSave} 
+        onOpen={handleOpen} 
+        onReport={handleReport} 
+        verErrores={verErrores}
+        verSimbolos={verSimbolos}
+      />
       
       <div className="main-content">
         <div className="editor-section">

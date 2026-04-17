@@ -1,22 +1,14 @@
-/* ============================================================
-   GoScript — Gramática Jison
-   Fase 1 + Fase 2
-   - Identificadores, comentarios, tipos primitivos
-   - Literales numéricos, strings, secuencias de escape, nil
-   - Palabras reservadas, case sensitive
-   - Bloques de sentencias y ámbitos (4.1)
-   - Signos de agrupación (4.2)
-   - Declaración de variables: explícita con tipo+valor,
-     explícita con tipo sin valor, implícita con := (4.2.1)
-   - func main() como punto de entrada reconocido
-   ============================================================ */
+%{
+    const { agregarError } = require('../Util/Errores');
+%}
+
 
 %lex
 
 %%
 
 /* ── Espacios en blanco ─────────────────────────────────── */
-\s+                         /* ignorar espacios, tabs, saltos de línea */
+// \s+                         /* ignorar espacios, tabs, saltos de línea */
 [ \t\r]+            /* ignorar espacios y tabs */
 \n+                 return 'NL'; // Ahora el enter es un token
 ";"                 return 'SEMICOLON';
@@ -127,6 +119,12 @@
 
 /* ── Carácter no reconocido ─────────────────────────────── */
 .                           return 'UNKNOWN';
+
+// ... en la sección del Lexer ...
+. { 
+    agregarError("Léxico", `El símbolo ${yytext} no es reconocido`, yylloc.first_line, yylloc.first_column); 
+}
+
 
 /lex
 
@@ -418,4 +416,15 @@ expresion
 
 
 
+// ... al final del archivo para errores sintácticos ...
+parser.parseError = function(str, hash) {
+    agregarError("Sintáctico", `Error recuperable: ${str}`, hash.line, hash.loc.first_column);
+};
+
+
+
 //modificar
+// camios
+//camhios
+
+// cambioss
