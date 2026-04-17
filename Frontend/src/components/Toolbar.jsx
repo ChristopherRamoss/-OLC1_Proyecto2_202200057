@@ -3,7 +3,7 @@ import { MdPlayArrow, MdSave, MdDelete, MdFolderOpen } from 'react-icons/md';
 import '../styles/components.css';
 import { MdBarChart } from 'react-icons/md'; // Ícono para reportes
 
-export default function Toolbar({ onRun, onClear, onSave, onOpen, verErrores, verSimbolos}) {
+export default function Toolbar({ onRun, onClear, onSave, onOpen, verErrores, verSimbolos, verAST}) {
   const fileInputRef = useRef(null);
 
   const handleOpenClick = () => {
@@ -60,6 +60,10 @@ export default function Toolbar({ onRun, onClear, onSave, onOpen, verErrores, ve
         
         <button onClick={verSimbolos} style={{ backgroundColor: '#5cb85c', color: 'white' }}>
             Tabla de Símbolos
+        </button>
+
+        <button onClick={verAST} style={{ backgroundColor: '#0275d8', color: 'white' }}>
+            Ver AST
         </button>
 
     </div>

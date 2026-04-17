@@ -6,6 +6,7 @@ import Console from './Console';
 import { parserService } from '../services/parserService';
 import '../styles/components.css';
 
+
 export default function Layout() {
   const [code, setCode] = useState('');
   const [output, setOutput] = useState('');
@@ -65,6 +66,10 @@ export default function Layout() {
   const verSimbolos = () => {
       window.open('http://localhost:4000/reporte-tabla', '_blank');
   };
+  
+  const verAST = () => {
+    window.open('http://localhost:4000/reporte-ast', '_blank');
+  };
 
   const handleClear = () => {
     setCode('');
@@ -100,6 +105,7 @@ export default function Layout() {
         onReport={handleReport} 
         verErrores={verErrores}
         verSimbolos={verSimbolos}
+        verAST={verAST}
       />
       
       <div className="main-content">
