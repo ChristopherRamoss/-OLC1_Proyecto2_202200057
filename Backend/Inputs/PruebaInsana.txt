@@ -1,0 +1,529 @@
+// ============================================================
+// ARCHIVO DE PRUEBA COMPLETO — GoScript
+// Cubre todas las funcionalidades del enunciado
+// ============================================================
+
+
+// ── 1. VARIABLES GLOBALES ────────────────────────────────────
+var globalInt int = 100
+var globalFloat float64 = 3.14
+var globalString string = "Hola GoScript"
+var globalBool bool = true
+var globalRune rune = 'A'
+var sinValorInt int
+var sinValorFloat float64
+
+
+// ── 2. CONSTANTES GLOBALES ───────────────────────────────────
+const PI float64 = 3.14159
+const SALUDO = "Hola Mundo"
+const MAX int = 999
+
+
+// ── 3. STRUCT GLOBAL ─────────────────────────────────────────
+struct Persona {
+    string Nombre;
+    int Edad;
+    bool EsEstudiante;
+}
+
+struct Producto {
+    int id;
+    string nombre;
+    float64 precio;
+}
+
+struct Nodo {
+    int valor;
+    Nodo siguiente;
+}
+
+
+// ── 4. FUNCIONES GLOBALES ────────────────────────────────────
+
+// Función sin parámetros y sin retorno
+func saludar() {
+    fmt.Println("Hola desde una función!")
+}
+
+// Función con parámetros y retorno int
+func sumar(a int, b int) int {
+    return a + b
+}
+
+// Función con retorno float64
+func dividir(a float64, b float64) float64 {
+    return a / b
+}
+
+// Función con retorno bool
+func esMayor(a int, b int) bool {
+    return a > b
+}
+
+// Función con retorno string
+func concatenar(a string, b string) string {
+    return a + b
+}
+
+// Función que trabaja con slices (por referencia)
+func agregarElemento(s []int, val int) []int {
+    return append(s, val)
+}
+
+// Función que trabaja con struct (por referencia)
+func actualizarNombre(p Persona, nuevoNombre string) {
+    p.Nombre = nuevoNombre
+}
+
+// Función recursiva
+func factorial(n int) int {
+    if n <= 1 {
+        return 1
+    }
+    return n * factorial(n - 1)
+}
+
+
+// ── 5. FUNCIÓN MAIN ──────────────────────────────────────────
+func main() {
+
+    // ── 5.1 Declaración de variables locales ─────────────────
+    x := 10
+    y := 20
+    nombre := "GoScript"
+    activo := false
+    caracter := 'Z'
+
+    var a int = 5
+    var b float64 = 2.5
+    var c string = "prueba"
+    var d bool = true
+    var e rune = 'X'
+    var f int
+
+    fmt.Println("Variables locales:", x, y, nombre, activo, caracter)
+    fmt.Println("Variables con var:", a, b, c, d, e, f)
+
+
+    // ── 5.2 Operaciones aritméticas ──────────────────────────
+    suma := x + y
+    resta := y - x
+    producto := x * a
+    cociente := y / x
+    modulo := y % 3
+    negacion := -x
+
+    // Conversión implícita int a float64
+    var mixto float64 = 5
+    mezcla := x + b
+
+    fmt.Println("Suma:", suma)
+    fmt.Println("Resta:", resta)
+    fmt.Println("Producto:", producto)
+    fmt.Println("Cociente:", cociente)
+    fmt.Println("Módulo:", modulo)
+    fmt.Println("Negación:", negacion)
+    fmt.Println("Mixto float:", mixto)
+    fmt.Println("Mezcla int+float:", mezcla)
+
+    // Operaciones de suma con distintos tipos
+    strInt := "manzanas" + 5
+    strFloat := "precio: " + 1.5
+    intBool := 5 + true
+    intRune := 3 + 'A'
+    fmt.Println("string+int:", strInt)
+    fmt.Println("string+float:", strFloat)
+    fmt.Println("int+bool:", intBool)
+    fmt.Println("int+rune:", intRune)
+
+    // Multiplicación especial: int * string
+    repetido := 3 * "ha"
+    fmt.Println("int*string:", repetido)
+
+
+    // ── 5.3 Operadores de asignación compuesta ───────────────
+    x += 5
+    fmt.Println("x += 5:", x)
+    x -= 3
+    fmt.Println("x -= 3:", x)
+    x *= 2
+    fmt.Println("x *= 2:", x)
+    x /= 4
+    fmt.Println("x /= 4:", x)
+    x %= 3
+    fmt.Println("x %= 3:", x)
+
+    nombre += " es genial"
+    fmt.Println("nombre +=:", nombre)
+
+
+    // ── 5.4 Operadores relacionales y lógicos ────────────────
+    r1 := 10 == 10
+    r2 := 10 != 5
+    r3 := 3 < 5
+    r4 := 5 > 3
+    r5 := 3 <= 3
+    r6 := 4 >= 4
+    r7 := "abc" == "abc"
+    r8 := 'a' < 'b'
+
+    fmt.Println("Relacionales:", r1, r2, r3, r4, r5, r6, r7, r8)
+
+    l1 := true && false
+    l2 := true || false
+    l3 := !true
+    fmt.Println("Lógicos:", l1, l2, l3)
+
+
+    // ── 5.5 Signos de agrupación ─────────────────────────────
+    agrupado := 3 - (1 + 3) * 32 / 90
+    fmt.Println("Agrupado:", agrupado)
+    complejo := (10 + 2) * (3 - 1) / (4 % 3)
+    fmt.Println("Complejo:", complejo)
+
+
+    // ── 5.6 Sentencia IF / ELSE IF / ELSE ────────────────────
+    edad := 18
+
+    if edad >= 18 {
+        fmt.Println("Es mayor de edad")
+    }
+
+    if edad > 20 {
+        fmt.Println("Mayor de 20")
+    } else if edad == 18 {
+        fmt.Println("Tiene exactamente 18")
+    } else {
+        fmt.Println("Menor de 18")
+    }
+
+    // IF sin paréntesis en la condición (ambas formas válidas)
+    if (edad >= 18) {
+        fmt.Println("Mayor de edad (con paréntesis)")
+    }
+
+    // IF anidado
+    if edad >= 18 {
+        if edad < 65 {
+            fmt.Println("Adulto en edad laboral")
+        }
+    }
+
+
+    // ── 5.7 Sentencia SWITCH / CASE ──────────────────────────
+    dia := 3
+
+    switch dia {
+    case 1:
+        fmt.Println("Lunes")
+    case 2:
+        fmt.Println("Martes")
+    case 3:
+        fmt.Println("Miércoles")
+    case 4:
+        fmt.Println("Jueves")
+    case 5:
+        fmt.Println("Viernes")
+    default:
+        fmt.Println("Fin de semana")
+    }
+
+    // Switch con string
+    color := "rojo"
+    switch color {
+    case "rojo":
+        fmt.Println("Color: Rojo")
+    case "azul":
+        fmt.Println("Color: Azul")
+    default:
+        fmt.Println("Color desconocido")
+    }
+
+    // Switch sin default
+    numero := 7
+    switch numero {
+    case 1:
+        fmt.Println("Uno")
+    case 7:
+        fmt.Println("Siete")
+    }
+
+
+    // ── 5.8 Bucle FOR (estilo while) ─────────────────────────
+    i := 1
+    for i <= 5 {
+        fmt.Println("while-style i:", i)
+        i++
+    }
+
+
+    // ── 5.9 Bucle FOR clásico ────────────────────────────────
+    for j := 0; j < 5; j++ {
+        fmt.Println("for clásico j:", j)
+    }
+
+    // For con decremento
+    for k := 10; k > 0; k-- {
+        fmt.Println("decremento k:", k)
+    }
+
+    // For con asignación compuesta en post
+    for m := 0; m < 20; m += 5 {
+        fmt.Println("paso 5 m:", m)
+    }
+
+
+    // ── 5.10 BREAK y CONTINUE ────────────────────────────────
+    for n := 0; n < 10; n++ {
+        if n == 5 {
+            fmt.Println("break en n=5")
+            break
+        }
+        fmt.Println("n:", n)
+    }
+
+    for p := 1; p <= 10; p++ {
+        if p % 2 == 0 {
+            continue
+        }
+        fmt.Println("impar:", p)
+    }
+
+
+    // ── 5.11 SLICES ──────────────────────────────────────────
+
+    // Declaración con valores
+    numeros := []int{10, 20, 30, 40, 50}
+    palabras := []string{"hola", "mundo", "go"}
+    booleanos := []bool{true, false, true}
+    flotantes := []float64{1.1, 2.2, 3.3}
+
+    fmt.Println("Slice int:", numeros)
+    fmt.Println("Slice string:", palabras)
+    fmt.Println("Slice bool:", booleanos)
+    fmt.Println("Slice float64:", flotantes)
+
+    // Slice vacío declarado con var
+    var sliceVacio []int
+    fmt.Println("Slice vacío:", sliceVacio)
+
+    // Acceso a elemento
+    fmt.Println("numeros[0]:", numeros[0])
+    fmt.Println("numeros[2]:", numeros[2])
+    fmt.Println("palabras[1]:", palabras[1])
+
+    // Modificación de elemento
+    numeros[2] = 999
+    fmt.Println("numeros[2] modificado:", numeros[2])
+    fmt.Println("Slice tras modificación:", numeros)
+
+    // Asignación compuesta en índice
+    numeros[0] += 100
+    fmt.Println("numeros[0] += 100:", numeros[0])
+
+    // Función len
+    longitud := len(numeros)
+    fmt.Println("len(numeros):", longitud)
+
+    // Función append
+    numeros = append(numeros, 60)
+    fmt.Println("append 60:", numeros)
+    numeros = append(numeros, 70)
+    fmt.Println("append 70:", numeros)
+
+    // slices.Index
+    idx := slices.Index(numeros, 999)
+    fmt.Println("slices.Index(numeros, 999):", idx)
+    idx2 := slices.Index(numeros, 9999)
+    fmt.Println("slices.Index(numeros, 9999):", idx2)
+
+    // strings.Join
+    frase := strings.Join(palabras, " ")
+    fmt.Println("strings.Join:", frase)
+
+    fraseComa := strings.Join(palabras, ", ")
+    fmt.Println("strings.Join coma:", fraseComa)
+
+
+    // ── 5.12 FOR RANGE sobre slice ───────────────────────────
+    for idx, val := range numeros {
+        fmt.Println("range idx:", idx, "val:", val)
+    }
+
+    // Range solo con valor (ignorando índice)
+    for val := range palabras {
+        fmt.Println("range val:", val)
+    }
+
+
+    // ── 5.13 SLICES MULTIDIMENSIONALES ───────────────────────
+    matriz := [][]int{
+        {1, 2, 3},
+        {4, 5, 6},
+        {7, 8, 9},
+    }
+
+    fmt.Println("matriz[0][0]:", matriz[0][0])
+    fmt.Println("matriz[1][2]:", matriz[1][2])
+    fmt.Println("matriz[2][1]:", matriz[2][1])
+
+    // Modificar elemento
+    matriz[0][0] = 100
+    fmt.Println("matriz[0][0] modificado:", matriz[0][0])
+
+    // Slice 2D con filas de distinto tamaño
+    jagged := [][]int{
+        {1, 2, 3},
+        {4, 5},
+        {6, 7, 8, 9},
+    }
+    fmt.Println("jagged[2][3]:", jagged[2][3])
+
+    // Agregar fila con append
+    nuevaFila := []int{10, 11, 12}
+    matriz = append(matriz, nuevaFila)
+    fmt.Println("nueva fila matriz[3][1]:", matriz[3][1])
+
+    // For range sobre matriz
+    for fila, rowVal := range matriz {
+        fmt.Println("fila:", fila, "contenido:", rowVal)
+    }
+
+
+    // ── 5.14 STRUCTS ─────────────────────────────────────────
+
+    // Instanciación con ID ID = { ... }
+    Persona p1 = { Nombre: "Alice", Edad: 25, EsEstudiante: true }
+    Persona p2 = { Nombre: "Bob", Edad: 30, EsEstudiante: false }
+    Producto prod1 = { id: 1, nombre: "Laptop", precio: 999.99 }
+
+    fmt.Println("Struct p1:", p1)
+    fmt.Println("Struct prod1:", prod1)
+
+    // Acceso a atributos
+    fmt.Println("Nombre p1:", p1.Nombre)
+    fmt.Println("Edad p1:", p1.Edad)
+    fmt.Println("EsEstudiante p1:", p1.EsEstudiante)
+    fmt.Println("precio prod1:", prod1.precio)
+
+    // Modificación de atributos
+    p1.Nombre = "Alicia"
+    p1.Edad = 26
+    fmt.Println("Nombre modificado:", p1.Nombre)
+    fmt.Println("Edad modificada:", p1.Edad)
+
+    // Asignación compuesta en atributo
+    prod1.precio += 50.0
+    fmt.Println("precio += 50:", prod1.precio)
+
+    // Llamada a función con struct
+    actualizarNombre(p2, "Roberto")
+    fmt.Println("Nombre p2 tras función:", p2.Nombre)
+
+
+    // ── 5.15 FUNCIONES EMBEBIDAS ─────────────────────────────
+
+    // strconv.Atoi
+    numStr := strconv.Atoi("123")
+    fmt.Println("strconv.Atoi:", numStr)
+
+    // strconv.ParseFloat
+    floatStr := strconv.ParseFloat("3.14159")
+    fmt.Println("strconv.ParseFloat:", floatStr)
+
+    // reflect.TypeOf
+    tipoInt := reflect.TypeOf(x)
+    tipoFloat := reflect.TypeOf(b)
+    tipoString := reflect.TypeOf(nombre)
+    tipoBool := reflect.TypeOf(activo)
+    tipoSlice := reflect.TypeOf(numeros)
+    tipoStruct := reflect.TypeOf(p1)
+
+    fmt.Println("tipo int:", tipoInt)
+    fmt.Println("tipo float64:", tipoFloat)
+    fmt.Println("tipo string:", tipoString)
+    fmt.Println("tipo bool:", tipoBool)
+    fmt.Println("tipo slice:", tipoSlice)
+    fmt.Println("tipo struct:", tipoStruct)
+
+
+    // ── 5.16 LLAMADAS A FUNCIONES GLOBALES ───────────────────
+    saludar()
+    resultSuma := sumar(3, 7)
+    fmt.Println("sumar(3,7):", resultSuma)
+
+    resultDiv := dividir(10.0, 3.0)
+    fmt.Println("dividir(10,3):", resultDiv)
+
+    resultMayor := esMayor(10, 5)
+    fmt.Println("esMayor(10,5):", resultMayor)
+
+    resultConcat := concatenar("Hola ", "Mundo")
+    fmt.Println("concatenar:", resultConcat)
+
+    // Función que usa slices
+    listaInt := []int{1, 2, 3}
+    listaInt = agregarElemento(listaInt, 4)
+    fmt.Println("agregarElemento:", listaInt)
+
+    // Recursividad
+    fact5 := factorial(5)
+    fmt.Println("factorial(5):", fact5)
+
+
+    // ── 5.17 BLOQUES INDEPENDIENTES (4.1) ────────────────────
+    z := 0
+    fmt.Println("z antes del bloque:", z)
+
+    {
+        j := 99
+        z := 40
+        fmt.Println("j en bloque:", j)
+        fmt.Println("z en bloque (shadow):", z)
+    }
+
+    fmt.Println("z fuera del bloque:", z)
+
+
+    // ── 5.18 VARIABLES GLOBALES ACCESIBLES ───────────────────
+    fmt.Println("globalInt:", globalInt)
+    fmt.Println("globalFloat:", globalFloat)
+    fmt.Println("globalString:", globalString)
+    fmt.Println("PI:", PI)
+    fmt.Println("SALUDO:", SALUDO)
+
+
+    // ── 5.19 fmt.Print (sin salto de línea) ──────────────────
+    fmt.Print("Sin salto ")
+    fmt.Print("de línea ")
+    fmt.Println("fin")
+
+
+    // ── 5.20 EXPRESIONES COMPLEJAS ───────────────────────────
+    compleja1 := (10 + 2) * factorial(3) - sumar(1, 1)
+    fmt.Println("expresión compleja 1:", compleja1)
+
+    sliceAux := []int{5, 10, 15}
+    compleja2 := sliceAux[0] + sliceAux[1] * 2
+    fmt.Println("expresión compleja 2:", compleja2)
+
+    // Expresión con atributo de struct en operación
+    edadDoble := p1.Edad * 2
+    fmt.Println("edad doble:", edadDoble)
+
+    // Condición con acceso a slice y struct
+    if len(numeros) > 5 && p1.Edad >= 18 {
+        fmt.Println("slice largo y persona adulta")
+    }
+
+    // Switch sobre resultado de función
+    switch sumar(2, 3) {
+    case 5:
+        fmt.Println("2+3 = 5, correcto")
+    default:
+        fmt.Println("resultado inesperado")
+    }
+
+    fmt.Println("=== FIN DE PRUEBAS ===")
+}
