@@ -7,24 +7,17 @@
 
 %%
 
-/* ── Espacios en blanco ─────────────────────────────────── */
-// \s+                         /* ignorar espacios, tabs, saltos de línea */
 [ \t\r]+            /* ignorar espacios y tabs */
-\n+                 return 'NL'; // Ahora el enter es un token
+\n+                 return 'NL';
 ";"                 return 'SEMICOLON';
 
-/* ── Comentarios ────────────────────────────────────────── */
-"//"[^\n]*                  /* comentario de una línea — ignorar */
-"/*"[\s\S]*?"*/"            /* comentario multilínea — ignorar */
+"//"[^\n]*                  /* comentario de una línea */
+"/*"[\s\S]*?"*/"            /* comentario multilínea */
 
-/* ── Literales booleanos ────────────────────────────────── */
 "true"                      return 'TRUE';
 "false"                     return 'FALSE';
-
-/* ── Valor nulo ─────────────────────────────────────────── */
 "nil"                       return 'NIL';
 
-/* ── Palabras reservadas ────────────────────────────────── */
 "int"                       return 'T_INT';
 "float64"                   return 'T_FLOAT64';
 "string"                    return 'T_STRING';
@@ -37,25 +30,19 @@
 "if"                        return 'IF';
 "else"                      return 'ELSE';
 "for"                       return 'FOR';
-"while"                     return 'WHILE';
 "break"                     return 'BREAK';
 "continue"                  return 'CONTINUE';
 "switch"                    return 'SWITCH';
 "case"                      return 'CASE';
 "default"                   return 'DEFAULT';
 "struct"                    return 'STRUCT';
-"range"                     return 'RANGE';         // nuevo
-"interface"                 return 'INTERFACE';
-"package"                   return 'PACKAGE';
-"import"                    return 'IMPORT';
-"fmt"                       return 'FMT';
-"println"                   return 'PRINTLN';
-"print"                     return 'PRINT';
+"range"                     return 'RANGE';
 "main"                      return 'MAIN';
+"fmt"                       return 'FMT';
 "Println"                   return 'PRINTLN';
+"println"                   return 'PRINTLN';
 "Print"                     return 'PRINT';
-
-/* ── Funciones embebidas nuevas (namespaces) ── */
+"print"                     return 'PRINT';
 "strconv"                   return 'STRCONV';
 "Atoi"                      return 'ATOI';
 "ParseFloat"                return 'PARSEFLOAT';
@@ -68,24 +55,14 @@
 "append"                    return 'APPEND';
 "len"                       return 'LEN';
 
-/* ── Literales numéricos ─────────────────────────────────
-   float64: dígitos, punto decimal obligatorio, exponente opcional
-   int    : solo dígitos enteros                               */
 [0-9]+"."[0-9]+([eE][+-]?[0-9]+)?   return 'LIT_FLOAT';
 [0-9]+                               return 'LIT_INT';
 
-/* ── Literales de cadena (string) ───────────────────────── 
-   Soporta secuencias de escape: \" \\ \n \r \t             */
 \"(\\[\"\\nrt]|[^\"\\])*\"           return 'LIT_STRING';
-
-/* ── Literal de rune (carácter simple entre comillas simples) */
 \'(\\[\'\\nrt]|[^\\'\\])\'           return 'LIT_RUNE';
 
-/* ── Identificadores ────────────────────────────────────── 
-   Inician con letra o guión bajo; siguen letras, dígitos o _ */
 [a-zA-Z_][a-zA-Z0-9_]*              return 'ID';
 
-/* ── Operadores aritméticos ─────────────────────────────── */
 "++"                        return 'INC';
 "--"                        return 'DEC';
 "+"                         return 'PLUS';
@@ -94,7 +71,6 @@
 "/"                         return 'DIVIDE';
 "%"                         return 'MOD';
 
-/* ── Operadores de asignación ───────────────────────────── */
 ":="                        return 'DECL_ASSIGN';
 "+="                        return 'PLUS_ASSIGN';
 "-="                        return 'MINUS_ASSIGN';
@@ -103,7 +79,6 @@
 "%="                        return 'MOD_ASSIGN';
 "="                         return 'ASSIGN';
 
-/* ── Operadores relacionales ────────────────────────────── */
 "=="                        return 'EQ';
 "!="                        return 'NEQ';
 "<="                        return 'LTE';
@@ -111,40 +86,30 @@
 "<"                         return 'LT';
 ">"                         return 'GT';
 
-/* ── Operadores lógicos ─────────────────────────────────── */
 "&&"                        return 'AND';
 "||"                        return 'OR';
 "!"                         return 'NOT';
 
-/* ── Delimitadores ──────────────────────────────────────── */
 "("                         return 'LPAREN';
 ")"                         return 'RPAREN';
 "{"                         return 'LBRACE';
 "}"                         return 'RBRACE';
 "["                         return 'LBRACKET';
 "]"                         return 'RBRACKET';
-";"                         return 'SEMICOLON';
 ","                         return 'COMMA';
 "."                         return 'DOT';
 ":"                         return 'COLON';
 
-/* ── Fin de entrada ─────────────────────────────────────── */
 <<EOF>>                     return 'EOF';
 
-/* ── Carácter no reconocido ─────────────────────────────── */
-.                           return 'UNKNOWN';
-
-// ... en la sección del Lexer ...
-. { 
-    agregarError("Léxico", `El símbolo ${yytext} no es reconocido`, yylloc.first_line, yylloc.first_column); 
+.   {
+    agregarError("Léxico", `El símbolo ${yytext} no es reconocido`, yylloc.first_line, yylloc.first_column);
 }
-
 
 /lex
 
 /* ============================================================
-   PRECEDENCIA Y ASOCIATIVIDAD
-   (de menor a mayor precedencia — el último tiene mayor)
+   PRECEDENCIA — de menor a mayor
    ============================================================ */
 %right      ASSIGN DECL_ASSIGN PLUS_ASSIGN MINUS_ASSIGN TIMES_ASSIGN DIVIDE_ASSIGN MOD_ASSIGN
 %left       OR
@@ -155,57 +120,57 @@
 %left       TIMES DIVIDE MOD
 %right      UMINUS NOT
 %left       INC DEC
-%left       LBRACKET RBRACKET          /* acceso a índices de slice */
-%left       DOT                        /* acceso a atributo de struct */
-%left       LPAREN RPAREN LBRACKET RBRACKET DOT
+%left       LBRACKET RBRACKET
+%left       DOT
+%left       LPAREN RPAREN
 
-/* ============================================================
-   REGLAS GRAMATICALES (Parser)
-   ============================================================ */
 %start programa
 
 %%
 
-/* ── Programa principal ─────────────────────────────────────
-   El programa puede ser:
-   a) Una función main (punto de entrada estándar GoScript)
-   b) Declaraciones sueltas en ámbito global               */
+/* ── Programa ─────────────────────────────────────────────── */
 programa
-    : declaraciones_globales EOF
-        { return $1; }
+    : declaraciones_globales EOF  { return $1; }
     ;
 
-/* ── func main() — punto de entrada ─────────────────────── */
-func_main
-    : FUNC MAIN LPAREN RPAREN bloque
-        { $$ = { tipo: 'func_main', cuerpo: $5 }; }
+/* ── NL opcionales ───────────────────────────────────────── */
+nl_opt
+    : nl_opt NL  { $$ = null; }
+    | /* vacío */ { $$ = null; }
     ;
 
-/* ── Declaraciones en ámbito global ─────────────────────── */
-declaraciones_globales
-    : declaraciones_globales declaracion_global { $1.push($2); $$ = $1; }
-    | /* vacío */                               { $$ = []; }
-    ;
-
+/* ── Terminador ──────────────────────────────────────────── */
 terminador
     : SEMICOLON
     | NL
     ;
 
+/* ── Declaraciones globales ──────────────────────────────── */
+declaraciones_globales
+    : declaraciones_globales declaracion_global  { $1.push($2); $$ = $1; }
+    | /* vacío */                                { $$ = []; }
+    ;
 
 declaracion_global
     : decl_variable terminador   { $$ = $1; }
     | decl_constante terminador  { $$ = $1; }
-    | decl_funcion              { $$ = $1; }
-    | func_main                 { $$ = $1; }
+    | decl_funcion               { $$ = $1; }
+    | func_main                  { $$ = $1; }
     | decl_struct                { $$ = $1; }
-    | NL                        { $$ = null; } // Ignorar líneas vacías globales
-    | error terminador           { $$ = null; } // <--- RECUPERACIÓN GLOBAL
+    | NL                         { $$ = null; }
+    | error terminador           { $$ = null; }
     ;
 
+/* ── func main ───────────────────────────────────────────── */
+func_main
+    : FUNC MAIN LPAREN RPAREN bloque
+        { $$ = { tipo: 'func_main', cuerpo: $5 }; }
+    ;
+
+/* ── Structs ─────────────────────────────────────────────── */
 decl_struct
-    : STRUCT ID LBRACE campos_struct RBRACE
-        { $$ = { tipo: 'decl_struct', nombre: $2, campos: $4 }; }
+    : STRUCT ID LBRACE nl_opt campos_struct RBRACE
+        { $$ = { tipo: 'decl_struct', nombre: $2, campos: $5 }; }
     ;
 
 campos_struct
@@ -214,117 +179,66 @@ campos_struct
     ;
 
 campo_struct
-    : tipo ID terminador
-        { $$ = { tipoDato: $1, nombre: $2 }; }
+    : tipo ID SEMICOLON nl_opt  { $$ = { tipoDato: $1, nombre: $2 }; }
+    | tipo ID NL nl_opt         { $$ = { tipoDato: $1, nombre: $2 }; }
     ;
 
+/* ── Tipos ───────────────────────────────────────────────── */
+tipo
+    : T_INT                  { $$ = 'int'; }
+    | T_FLOAT64              { $$ = 'float64'; }
+    | T_STRING               { $$ = 'string'; }
+    | T_BOOL                 { $$ = 'bool'; }
+    | T_RUNE                 { $$ = 'rune'; }
+    | LBRACKET RBRACKET tipo { $$ = '[]' + $3; }
+    | ID                     { $$ = $1; }
+    ;
 
-/* ── Declaración de variables ───────────────────────────────
-   Forma 1 (explícita con tipo y valor):  var nombre tipo = expr
-   Forma 2 (explícita con tipo sin valor): var nombre tipo
-   Forma 3 (implícita, inferencia):        nombre := expr       */
+/* ── Declaración de variables ────────────────────────────── */
 decl_variable
     : VAR ID tipo ASSIGN expresion
-        { 
+        {
             require('../Util/TablaSimbolos').listaSimbolos.push({
-                id: $2, 
-                tipoSimbolo: 'Variable', 
-                tipoDato: $3, 
-                ambito: 'Global',
-                linea: yylineno + 1, 
-                columna: @2.first_column // <--- CAMBIA ESTO
+                id: $2, tipoSimbolo: 'Variable', tipoDato: $3,
+                ambito: 'Global', linea: yylineno + 1, columna: @2.first_column
             });
-            $$ = { tipo: 'decl_var', forma: 'explicita_valor', nombre: $2, tipoDato: $3, valor: $5 }; 
+            $$ = { tipo: 'decl_var', forma: 'explicita_valor', nombre: $2, tipoDato: $3, valor: $5 };
         }
     | VAR ID tipo
-        { 
+        {
             require('../Util/TablaSimbolos').listaSimbolos.push({
-                id: $2, 
-                tipoSimbolo: 'Variable', 
-                tipoDato: $3, 
-                ambito: 'Global',
-                linea: yylineno + 1, 
-                columna: @2.first_column // <--- CAMBIA ESTO
+                id: $2, tipoSimbolo: 'Variable', tipoDato: $3,
+                ambito: 'Global', linea: yylineno + 1, columna: @2.first_column
             });
-            $$ = { tipo: 'decl_var', forma: 'explicita_sin_valor', nombre: $2, tipoDato: $3, valor: null }; 
+            $$ = { tipo: 'decl_var', forma: 'explicita_sin_valor', nombre: $2, tipoDato: $3, valor: null };
         }
     | VAR ID ASSIGN expresion
-        { 
+        {
             require('../Util/TablaSimbolos').listaSimbolos.push({
-                id: $2, 
-                tipoSimbolo: 'Variable', 
-                tipoDato: 'inferido', 
-                ambito: 'Global',
-                linea: yylineno + 1, 
-                columna: @2.first_column // <--- CAMBIA ESTO
+                id: $2, tipoSimbolo: 'Variable', tipoDato: 'inferido',
+                ambito: 'Global', linea: yylineno + 1, columna: @2.first_column
             });
-            $$ = { tipo: 'decl_var', forma: 'explicita_valor', nombre: $2, tipoDato: null, valor: $4 }; 
+            $$ = { tipo: 'decl_var', forma: 'explicita_valor', nombre: $2, tipoDato: null, valor: $4 };
         }
     | ID DECL_ASSIGN expresion
-        { 
-            require('../Util/TablaSimbolos').listaSimbolos.push({
-                id: $1, 
-                tipoSimbolo: 'Variable', 
-                tipoDato: 'inferido', 
-                ambito: 'Local',
-                linea: yylineno + 1, 
-                columna: @1.first_column // <--- AQUÍ ES @1 porque ID es el primer elemento
-            });
-            $$ = { tipo: 'decl_var', forma: 'implicita', nombre: $1, tipoDato: null, valor: $3 }; 
-        }
-
-    | ID ID ASSIGN LBRACE lista_campos_instancia RBRACE
         {
-            /* Persona p = { Nombre: "Alice", Edad: 25 } */
             require('../Util/TablaSimbolos').listaSimbolos.push({
-                id: $2,
-                tipoSimbolo: 'Variable',
-                tipoDato: $1,
-                ambito: 'Local',
-                linea: yylineno + 1,
-                columna: @2.first_column
+                id: $1, tipoSimbolo: 'Variable', tipoDato: 'inferido',
+                ambito: 'Local', linea: yylineno + 1, columna: @1.first_column
             });
-            $$ = { tipo: 'decl_var', forma: 'struct_literal', tipoStruct: $1, nombre: $2, campos: $5 };
+            $$ = { tipo: 'decl_var', forma: 'implicita', nombre: $1, tipoDato: null, valor: $3 };
         }
-        ;
-
-literal_slice
-    : LBRACKET RBRACKET tipo LBRACE lista_expresiones RBRACE
-        { $$ = { tipo: 'lit_slice', tipoDato: $3, elementos: $5 }; }
-    | LBRACKET RBRACKET tipo LBRACE RBRACE
-        { $$ = { tipo: 'lit_slice', tipoDato: $3, elementos: [] }; }
+    | ID ID ASSIGN LBRACE nl_opt lista_campos_instancia nl_opt RBRACE
+        {
+            require('../Util/TablaSimbolos').listaSimbolos.push({
+                id: $2, tipoSimbolo: 'Variable', tipoDato: $1,
+                ambito: 'Local', linea: yylineno + 1, columna: @2.first_column
+            });
+            $$ = { tipo: 'decl_var', forma: 'struct_literal', tipoStruct: $1, nombre: $2, campos: $6 };
+        }
     ;
 
-
-lista_filas_slice
-    : lista_filas_slice COMMA fila_slice  { $1.push($3); $$ = $1; }
-    | fila_slice                           { $$ = [$1]; }
-    ;
-
-
-fila_slice
-    : LBRACE lista_expresiones RBRACE  { $$ = $2; }
-    | LBRACE RBRACE                    { $$ = []; }
-    ;
-
-
-lista_expresiones
-    : lista_expresiones COMMA expresion  { $1.push($3); $$ = $1; }
-    | expresion                           { $$ = [$1]; }
-    ;
-
-
-
-lista_campos_instancia
-    : lista_campos_instancia COMMA campo_instancia  { $1.push($3); $$ = $1; }
-    | campo_instancia                                { $$ = [$1]; }
-    ;
-
-campo_instancia
-    : ID COLON expresion  { $$ = { campo: $1, valor: $3 }; }
-    ;
-
-/* ── Declaración de constantes ──────────────────────────── */
+/* ── Constantes ──────────────────────────────────────────── */
 decl_constante
     : CONST ID tipo ASSIGN expresion
         { $$ = { tipo: 'decl_const', nombre: $2, tipoDato: $3, valor: $5 }; }
@@ -332,18 +246,7 @@ decl_constante
         { $$ = { tipo: 'decl_const', nombre: $2, tipoDato: null, valor: $4 }; }
     ;
 
-/* ── Tipos de datos primitivos ──────────────────────────── */
-tipo
-    : T_INT      { $$ = 'int'; }
-    | T_FLOAT64  { $$ = 'float64'; }
-    | T_STRING   { $$ = 'string'; }
-    | T_BOOL     { $$ = 'bool'; }
-    | T_RUNE     { $$ = 'rune'; }
-    | LBRACKET RBRACKET tipo    { $$ = '[]' + $3; }   /* cubre []int, [][]int, [][][]int … */
-    | ID                        { $$ = $1; }            /* tipos struct por nombre */
-    ;
-
-/* ── Declaración de funciones ───────────────────────────── */
+/* ── Funciones ───────────────────────────────────────────── */
 decl_funcion
     : FUNC ID LPAREN parametros RPAREN tipo bloque
         { $$ = { tipo: 'decl_func', nombre: $2, params: $4, retorno: $6, cuerpo: $7 }; }
@@ -352,12 +255,12 @@ decl_funcion
     ;
 
 parametros
-    : lista_parametros
-    | /* vacío */  { $$ = []; }
+    : lista_parametros  { $$ = $1; }
+    | /* vacío */       { $$ = []; }
     ;
 
 lista_parametros
-    : lista_parametros COMMA parametro  { $$ = $1; $$.push($3); }
+    : lista_parametros COMMA parametro  { $1.push($3); $$ = $1; }
     | parametro                          { $$ = [$1]; }
     ;
 
@@ -365,44 +268,52 @@ parametro
     : ID tipo  { $$ = { nombre: $1, tipoDato: $2 }; }
     ;
 
-/* ── Bloque de sentencias (4.1) ─────────────────────────────
-   Delimitado por { }.
-   Puede contener sentencias y bloques anidados independientes.
-   Cada bloque define su propio ámbito léxico.              */
+/* ── Bloques ─────────────────────────────────────────────── */
 bloque
     : LBRACE sentencias RBRACE  { $$ = { tipo: 'bloque', cuerpo: $2 }; }
     ;
 
+/* FIX 1 y 3 — sentencias ahora incluye sentencia_con_bloque
+   que cubre if/else, for y switch SIN necesitar terminador
+   después del RBRACE de cierre. Esto resuelve el problema
+   de múltiples if consecutivos y for con if/else dentro:
+   
+   El problema raíz era:
+     sentencia_bloque : sentencia terminador
+   donde sentencia_if (que termina en RBRACE de bloque)
+   requería un NL/; después. Cuando había dos if seguidos,
+   el NL entre ellos era consumido como terminador del primero,
+   pero el siguiente NL antes del segundo if no existía o
+   confundía al parser.
+   
+   Solución: separar sentencias que terminan en RBRACE
+   (if, for, switch, bloque) de las que necesitan terminador
+   explícito. Las primeras van en sentencia_bloque directamente
+   sin pasar por `sentencia terminador`.                    */
 sentencias
-    : sentencias sentencia_bloque { if($2) $1.push($2); $$ = $1; }
-    | /* vacío */                 { $$ = []; }
+    : sentencias sentencia_bloque  { if($2 !== null) $1.push($2); $$ = $1; }
+    | /* vacío */                  { $$ = []; }
     ;
-
-/* Una sentencia dentro de un bloque puede ser:
-   - una sentencia normal terminada en ;
-   - un bloque independiente anidado { ... }  (4.1)         */
 
 sentencia_bloque
-    : sentencia terminador   { $$ = $1; }
-    | bloque                { $$ = $1; } // Bloque independiente (4.1) sin terminador
-    | NL                    { $$ = null; } // Ignorar líneas vacías internas
-    | error terminador       { $$ = null; } // <--- RECUPERACIÓN LOCAL
+    : sentencia_if                         { $$ = $1; }
+    | sentencia_for                        { $$ = $1; }
+    | sentencia_switch                     { $$ = $1; }
+    | bloque                               { $$ = $1; }
+    | decl_variable terminador             { $$ = $1; }
+    | decl_constante terminador            { $$ = $1; }
+    | asignacion terminador                { $$ = $1; }
+    | sentencia_return terminador          { $$ = $1; }
+    | sentencia_break terminador           { $$ = $1; }
+    | sentencia_continue terminador        { $$ = $1; }
+    | ID INC terminador    { $$ = { tipo: 'inc', nombre: $1 }; }
+    | ID DEC terminador    { $$ = { tipo: 'dec', nombre: $1 }; }
+    | expresion terminador                 { $$ = $1; }
+    | NL                                   { $$ = null; }
+    | error terminador                     { $$ = null; }
     ;
 
-/* ── Sentencias ─────────────────────────────────────────── */
-sentencia
-    : decl_variable
-    | decl_constante
-    | asignacion
-    | sentencia_if
-    | sentencia_for
-    | sentencia_switch
-    | sentencia_return
-    | sentencia_break
-    | sentencia_continue
-    | expresion
-    ;
-
+/* ── Asignaciones ────────────────────────────────────────── */
 asignacion
     : ID ASSIGN expresion
         { $$ = { tipo: 'asignacion', nombre: $1, valor: $3 }; }
@@ -416,8 +327,6 @@ asignacion
         { $$ = { tipo: 'asignacion_op', op: '/=', nombre: $1, valor: $3 }; }
     | ID MOD_ASSIGN expresion
         { $$ = { tipo: 'asignacion_op', op: '%=', nombre: $1, valor: $3 }; }
-    
-    /* ── Asignación a índice de slice ── */
     | acceso_indexado ASSIGN expresion
         { $$ = { tipo: 'asignacion_indice', acceso: $1, valor: $3 }; }
     | acceso_indexado PLUS_ASSIGN expresion
@@ -430,7 +339,6 @@ asignacion
         { $$ = { tipo: 'asignacion_op_indice', op: '/=', acceso: $1, valor: $3 }; }
     | acceso_indexado MOD_ASSIGN expresion
         { $$ = { tipo: 'asignacion_op_indice', op: '%=', acceso: $1, valor: $3 }; }
-    /* ── Asignación a atributo de struct ── */
     | acceso_atributo ASSIGN expresion
         { $$ = { tipo: 'asignacion_atributo', acceso: $1, valor: $3 }; }
     | acceso_atributo PLUS_ASSIGN expresion
@@ -445,9 +353,11 @@ asignacion
         { $$ = { tipo: 'asignacion_op_atributo', op: '%=', acceso: $1, valor: $3 }; }
     ;
 
-
-
-/* ── Sentencia if / else ────────────────────────────────── */
+/* ── IF / ELSE ───────────────────────────────────────────── */
+/* FIX 3 — sentencia_if ya no necesita terminador externo
+   porque sentencia_bloque la maneja directamente.
+   La cadena else if funciona porque sentencia_if puede
+   ser el sino de otro sentencia_if.                      */
 sentencia_if
     : IF expresion bloque
         { $$ = { tipo: 'if', condicion: $2, entonces: $3, sino: null }; }
@@ -457,7 +367,10 @@ sentencia_if
         { $$ = { tipo: 'if', condicion: $2, entonces: $3, sino: $5 }; }
     ;
 
-/* ── Sentencia for ──────────────────────────────────────── */
+/* ── FOR ─────────────────────────────────────────────────── */
+/* FIX 1 y 3 — sentencia_for tampoco necesita terminador
+   externo. El NL entre el } del for y la siguiente sentencia
+   es absorbido por sentencia_bloque : NL.                */
 sentencia_for
     : FOR expresion bloque
         { $$ = { tipo: 'for_while', condicion: $2, cuerpo: $3 }; }
@@ -469,42 +382,77 @@ sentencia_for
         { $$ = { tipo: 'for_range', indice: null, valor: $2, iterable: $5, cuerpo: $6 }; }
     ;
 
-
-
 sentencia_for_init
-    : decl_variable
-    | asignacion
-    | /* vacío */  { $$ = null; }
+    : decl_variable   { $$ = $1; }
+    | asignacion      { $$ = $1; }
+    | /* vacío */     { $$ = null; }
     ;
 
 sentencia_for_post
-    : asignacion
-    | ID INC  { $$ = { tipo: 'inc', nombre: $1 }; }
-    | ID DEC  { $$ = { tipo: 'dec', nombre: $1 }; }
-    | /* vacío */  { $$ = null; }
+    : asignacion      { $$ = $1; }
+    | ID INC          { $$ = { tipo: 'inc', nombre: $1 }; }
+    | ID DEC          { $$ = { tipo: 'dec', nombre: $1 }; }
+    | /* vacío */     { $$ = null; }
     ;
 
-/* ── Sentencias swich ──────────────────────────────── */
+/* ── SWITCH ──────────────────────────────────────────────── */
+/* FIX 4 — sentencia_switch tampoco necesita terminador
+   externo (termina en RBRACE).
+   
+   caso_switch ahora NO usa nl_opt después del COLON —
+   el NL tras `case 'A':` es consumido por sentencias_case
+   como sentencia_bloque_case : NL.
+   
+   FIX 4 específico para `case 'A':`: el problema era que
+   LIT_RUNE como expresión en CASE requiere que el parser
+   reduzca LIT_RUNE -> expresion antes del COLON.
+   Las reglas de precedencia y la gramática ya lo permiten,
+   pero la separación de sentencias_case con su propio
+   sentencia_bloque_case (sin error terminador) asegura
+   que CASE y DEFAULT sean tokens de corte correctos.    */
 sentencia_switch
-    : SWITCH expresion LBRACE lista_cases RBRACE
+    : SWITCH expresion LBRACE nl_opt lista_cases RBRACE
         { $$ = { tipo: 'switch', expresion: $2, casos: $4 }; }
     ;
 
 lista_cases
     : lista_cases caso_switch  { $1.push($2); $$ = $1; }
-    | /* vacío */               { $$ = []; }
+    | /* vacío */              { $$ = []; }
     ;
 
 caso_switch
-    : CASE expresion COLON sentencias
+    : CASE expresion COLON sentencias_case
         { $$ = { tipo: 'case', valor: $2, cuerpo: $4 }; }
-    | DEFAULT COLON sentencias
+    | DEFAULT COLON sentencias_case
         { $$ = { tipo: 'default', cuerpo: $3 }; }
     ;
 
+/* sentencias_case: no tiene `error terminador` para que
+   CASE, DEFAULT y RBRACE sean tokens de corte naturales. */
+sentencias_case
+    : sentencias_case sentencia_bloque_case  { if($2 !== null) $1.push($2); $$ = $1; }
+    | /* vacío */                            { $$ = []; }
+    ;
 
+/* FIX 4 — sentencia_bloque_case también separa sentencias
+   que terminan en } de las que necesitan terminador,
+   igual que sentencia_bloque principal.                  */
+sentencia_bloque_case
+    : sentencia_if               { $$ = $1; }
+    | sentencia_for              { $$ = $1; }
+    | sentencia_switch           { $$ = $1; }
+    | bloque                     { $$ = $1; }
+    | decl_variable terminador   { $$ = $1; }
+    | decl_constante terminador  { $$ = $1; }
+    | asignacion terminador      { $$ = $1; }
+    | sentencia_return terminador { $$ = $1; }
+    | sentencia_break terminador  { $$ = $1; }
+    | sentencia_continue terminador { $$ = $1; }
+    | expresion terminador       { $$ = $1; }
+    | NL                         { $$ = null; }
+    ;
 
-/* ── Sentencias de control ──────────────────────────────── */
+/* ── Sentencias de control ───────────────────────────────── */
 sentencia_return
     : RETURN expresion  { $$ = { tipo: 'return', valor: $2 }; }
     | RETURN            { $$ = { tipo: 'return', valor: null }; }
@@ -518,7 +466,7 @@ sentencia_continue
     : CONTINUE  { $$ = { tipo: 'continue' }; }
     ;
 
-/* ── Llamada a función ──────────────────────────────────── */
+/* ── Llamadas a función ──────────────────────────────────── */
 llamada_funcion
     : ID LPAREN argumentos RPAREN
         { $$ = { tipo: 'llamada', nombre: $1, args: $3 }; }
@@ -526,52 +474,38 @@ llamada_funcion
         { $$ = { tipo: 'llamada', nombre: 'fmt.Println', args: $5 }; }
     | FMT DOT PRINT LPAREN argumentos RPAREN
         { $$ = { tipo: 'llamada', nombre: 'fmt.Print', args: $5 }; }
-
-    /* ── strconv ── */
     | STRCONV DOT ATOI LPAREN expresion RPAREN
         { $$ = { tipo: 'llamada', nombre: 'strconv.Atoi', args: [$5] }; }
     | STRCONV DOT PARSEFLOAT LPAREN expresion RPAREN
         { $$ = { tipo: 'llamada', nombre: 'strconv.ParseFloat', args: [$5] }; }
-    /* ── reflect ── */
     | REFLECT DOT TYPEOF LPAREN expresion RPAREN
         { $$ = { tipo: 'llamada', nombre: 'reflect.TypeOf', args: [$5] }; }
-    /* ── slices ── */
     | SLICES DOT INDEX LPAREN expresion COMMA expresion RPAREN
         { $$ = { tipo: 'llamada', nombre: 'slices.Index', args: [$5, $7] }; }
-    /* ── strings ── */
     | STRINGS DOT JOIN LPAREN expresion COMMA expresion RPAREN
         { $$ = { tipo: 'llamada', nombre: 'strings.Join', args: [$5, $7] }; }
-    /* ── len y append ── */
     | LEN LPAREN expresion RPAREN
         { $$ = { tipo: 'llamada', nombre: 'len', args: [$3] }; }
     | APPEND LPAREN expresion COMMA expresion RPAREN
         { $$ = { tipo: 'llamada', nombre: 'append', args: [$3, $5] }; }
     ;
 
-
-
-
 argumentos
     : lista_argumentos  { $$ = $1; }
-    | /* vacío */        { $$ = []; }
+    | /* vacío */       { $$ = []; }
     ;
 
 lista_argumentos
-    : lista_argumentos COMMA expresion  { $$ = $1; $$.push($3); }
+    : lista_argumentos COMMA expresion  { $1.push($3); $$ = $1; }
     | expresion                          { $$ = [$1]; }
     ;
 
-/* ── Expresiones (4.2 — signos de agrupación incluidos) ────
-   La regla  LPAREN expresion RPAREN  implementa la agrupación.
-   Las precedencias declaradas arriba garantizan que
-   3 - (1 + 3) * 32 / 90  se evalúe correctamente.         */
+/* ── Expresiones ─────────────────────────────────────────── */
 expresion
-    /* Operadores lógicos */
     : expresion OR expresion
         { $$ = { tipo: 'op_bin', op: '||', izq: $1, der: $3 }; }
     | expresion AND expresion
         { $$ = { tipo: 'op_bin', op: '&&', izq: $1, der: $3 }; }
-    /* Operadores relacionales */
     | expresion EQ expresion
         { $$ = { tipo: 'op_bin', op: '==', izq: $1, der: $3 }; }
     | expresion NEQ expresion
@@ -584,7 +518,6 @@ expresion
         { $$ = { tipo: 'op_bin', op: '<=', izq: $1, der: $3 }; }
     | expresion GTE expresion
         { $$ = { tipo: 'op_bin', op: '>=', izq: $1, der: $3 }; }
-    /* Operadores aritméticos */
     | expresion PLUS expresion
         { $$ = { tipo: 'op_bin', op: '+', izq: $1, der: $3 }; }
     | expresion MINUS expresion
@@ -595,27 +528,15 @@ expresion
         { $$ = { tipo: 'op_bin', op: '/', izq: $1, der: $3 }; }
     | expresion MOD expresion
         { $$ = { tipo: 'op_bin', op: '%', izq: $1, der: $3 }; }
-    /* Operadores unarios */
     | MINUS expresion %prec UMINUS
         { $$ = { tipo: 'op_unario', op: '-', operando: $2 }; }
     | NOT expresion
         { $$ = { tipo: 'op_unario', op: '!', operando: $2 }; }
-    /* Incremento / decremento como expresión */
-    | ID INC  { $$ = { tipo: 'inc', nombre: $1 }; }
-    | ID DEC  { $$ = { tipo: 'dec', nombre: $1 }; }
-    /* Agrupación (4.2) — paréntesis cambian precedencia */
     | LPAREN expresion RPAREN  { $$ = $2; }
-    /* Llamada a función como expresión */
     | llamada_funcion
-
-    /* Acceso a elemento de slice: arr[i], mat[i][j] */
-    | acceso_indexado          { $$ = $1; }
-    /* Acceso a atributo de struct: obj.Campo */
-    | acceso_atributo          { $$ = $1; }
-    /* Literal de slice: []int{1,2,3} */
-    | literal_slice            { $$ = $1; }
-    
-    /* Literales y terminales */
+    | acceso_indexado   { $$ = $1; }
+    | acceso_atributo   { $$ = $1; }
+    | literal_slice     { $$ = $1; }
     | LIT_INT     { $$ = { tipo: 'lit_int',    valor: parseInt($1, 10) }; }
     | LIT_FLOAT   { $$ = { tipo: 'lit_float',  valor: parseFloat($1) }; }
     | LIT_STRING  { $$ = { tipo: 'lit_string', valor: $1 }; }
@@ -624,9 +545,9 @@ expresion
     | FALSE       { $$ = { tipo: 'lit_bool',   valor: false }; }
     | NIL         { $$ = { tipo: 'nil' }; }
     | ID          { $$ = { tipo: 'id',         nombre: $1 }; }
-
     ;
 
+/* ── Acceso indexado ─────────────────────────────────────── */
 acceso_indexado
     : ID LBRACKET expresion RBRACKET
         { $$ = { tipo: 'acceso_indice', objeto: { tipo: 'id', nombre: $1 }, indice: $3 }; }
@@ -636,11 +557,7 @@ acceso_indexado
         { $$ = { tipo: 'acceso_indice', objeto: $1, indice: $3 }; }
     ;
 
-
-/* -----------------------------------------------------------
-   2.7  acceso_atributo — NUEVA regla
-   Maneja obj.Campo y obj.Campo.SubCampo.
-   ----------------------------------------------------------- */
+/* ── Acceso a atributo ───────────────────────────────────── */
 acceso_atributo
     : ID DOT ID
         { $$ = { tipo: 'acceso_atributo', objeto: { tipo: 'id', nombre: $1 }, campo: $3 }; }
@@ -650,22 +567,58 @@ acceso_atributo
         { $$ = { tipo: 'acceso_atributo', objeto: $1, campo: $3 }; }
     ;
 
+/* ── Literales de slice ──────────────────────────────────── */
+/* FIX 2 — lista_elementos_slice usa COMMA nl_opt para
+   absorber los NL después de cada coma en la declaración
+   multilínea de slice 2D:
+       [][]int{
+           {1,2,3},   <- NL después de la coma es absorbido
+           {4,5,6},
+       }
+   elemento_slice acepta tanto filas {expr,...} como
+   expresiones simples, unificando 1D y 2D.            */
+literal_slice
+    : LBRACKET RBRACKET tipo LBRACE nl_opt lista_elementos_slice nl_opt RBRACE
+        { $$ = { tipo: 'lit_slice', tipoDato: $3, elementos: $5 }; }
+    | LBRACKET RBRACKET tipo LBRACE nl_opt RBRACE
+        { $$ = { tipo: 'lit_slice', tipoDato: $3, elementos: [] }; }
+    ;
+
+lista_elementos_slice
+    : lista_elementos_slice COMMA nl_opt elemento_slice
+        { $1.push($4); $$ = $1; }
+    | elemento_slice
+        { $$ = [$1]; }
+    ;
+
+elemento_slice
+    : LBRACE lista_expresiones RBRACE
+        { $$ = { tipo: 'fila_slice', elementos: $2 }; }
+    | LBRACE RBRACE
+        { $$ = { tipo: 'fila_slice', elementos: [] }; }
+    | expresion
+        { $$ = $1; }
+    ;
+
+lista_expresiones
+    : lista_expresiones COMMA expresion  { $1.push($3); $$ = $1; }
+    | expresion                           { $$ = [$1]; }
+    ;
+
+/* ── Instanciación de struct ─────────────────────────────── */
+lista_campos_instancia
+    : lista_campos_instancia COMMA nl_opt campo_instancia
+        { $1.push($4); $$ = $1; }
+    | campo_instancia
+        { $$ = [$1]; }
+    ;
+
+campo_instancia
+    : ID COLON expresion  { $$ = { campo: $1, valor: $3 }; }
+    ;
 
 %%
 
-
-
-// Al final del archivo .jison
 parser.parseError = function(str, hash) {
     agregarError("Sintáctico", `Error recuperable: ${str}`, hash.line, hash.loc.first_column);
 };
-
-
-
-// modificaciones
-// modificaciones
-// modificaciones
-// modificaciones
-// modificaciones
-// modificaciones
-// modificaciones

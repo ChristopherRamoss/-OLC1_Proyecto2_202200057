@@ -4,6 +4,7 @@ const parser = require('./Lenguaje/Parser'); // Tu parser de Jison
 const { listaErrores, limpiarErrores } = require('./Util/Errores');
 const { generarHTMLReporte } = require('./Util/Reportes');
 const { listaSimbolos } = require('./Util/TablaSimbolos');
+const interprete = require('./Lenguaje/Interprete');
 
 // NUEVO
 const { generarDOT } = require('./Util/GeneradorAST');
@@ -19,8 +20,6 @@ app.use(express.json()); // Permite leer JSON en las peticiones
 // RUTA PARA ANALIZAR
 app.post('/analizar', (req, res) => {
     const { codigo } = req.body;
-    // ... limpiar listas ...
-
     try {
         const ast = parser.parse(codigo); // Ejecuta el parser
         ultimoAST = ast; // <--- ¡ESTA LÍNEA ES LA QUE FALTA!
@@ -28,7 +27,6 @@ app.post('/analizar', (req, res) => {
         console.log("AST guardado correctamente"); // Agrega este log para estar seguro
         res.json({ ast, errores: listaErrores });
     } catch (e) {
-        ultimoAST = null;
         res.status(500).json({ error: e.message });
     }
 });

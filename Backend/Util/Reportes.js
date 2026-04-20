@@ -1,5 +1,5 @@
-// ELIMINA la palabra 'export' de aquí abajo:
 const generarHTMLReporte = (tipo, datos) => {
+    const listaSimbolos = [];
     const esError = tipo === 'ERRORES';
     const titulo = esError ? "Reporte de Errores" : "Tabla de Símbolos";
     const colorHeader = esError ? "#d9534f" : "#5cb85c";
