@@ -27,6 +27,8 @@ return "Reprobado"
 }
 
 func main() {
+
+// ERROR DE MATRIZ --------------------------------------------------------------
 notas := []int{61, 75, 88, 95}
 palabras := []string{"Compiladores", "OLC1", "Proyecto"}
 matriz := [][]int{
@@ -34,6 +36,7 @@ matriz := [][]int{
 {30, 40},
 {50, 60}
 }
+-------------------------------------------------------------
 
 Persona tutor = {Nombre:"Marcos", EsEstudiante: false}
 Curso c = {Nombre:"GoScript", Tutor: tutor}
@@ -58,11 +61,13 @@ mensaje := "Bloque interno"
 fmt.Println(mensaje)
 }
 
+// ERROR DE CONTADOR-------------------------------------------------------------
 contador := 0
 for contador < 3 {
 fmt.Println("Contador:", contador)
 contador++
 }
+--------------------------------------------------------------------------------------------------------------------------
 
 switch obtenerEstado(61) {
 case "Sobresaliente":
