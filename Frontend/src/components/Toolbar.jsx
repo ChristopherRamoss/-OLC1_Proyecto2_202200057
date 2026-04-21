@@ -33,7 +33,7 @@ export default function Toolbar({ onRun, onClear, onSave, onOpen, verErrores, ve
         type="file"
         onChange={handleFileChange}
         style={{ display: 'none' }}
-        accept=".txt,.js,.java,.c,.cpp,.py,.rb,.go,.ts,.jsx,.tsx"
+        accept=".txt,.gst,.js,.java,.c,.cpp,.py,.rb,.go,.ts,.jsx,.tsx"
       />
 
       
