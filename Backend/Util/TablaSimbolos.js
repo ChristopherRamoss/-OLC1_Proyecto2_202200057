@@ -1,3 +1,10 @@
+/* ============================================================
+La clase Simbolo es una estructura de datos diseñada para el 
+almacenamiento de metadatos de los identificadores. A diferencia del Entorno,
+que gestiona valores en tiempo de ejecución, este módulo se encarga de 
+recolectar la información necesaria para generar el reporte de la Tabla de Símbolos
+   ============================================================ */
+
 class Simbolo {
     constructor(id, tipoSimbolo, tipoDato, ambito, linea, columna) {
         this.id = id;

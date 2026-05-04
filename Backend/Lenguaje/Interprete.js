@@ -3,7 +3,7 @@ const { agregarError } = require('../Util/Errores');
 const { listaSimbolos, Simbolo } = require('../Util/TablaSimbolos');
 const Entorno = require('../Util/Entorno');
 
-/* ── Señales de control ───────────────────────────────── */
+/* ── Señales de control Indican al programa cómo comportarse */
 class SeñalBreak    { constructor() { this.esBreak    = true; } }
 class SeñalContinue { constructor() { this.esContinue = true; } }
 class SeñalReturn   { constructor(v) { this.esReturn  = true; this.valor = v; } }
@@ -35,12 +35,12 @@ const valorRune = (r) => {
     return 0;
 };
 
-const esRune = (v) =>
+const esRune = (v) => // 
     typeof v === 'string' && v.startsWith("'") && v.endsWith("'");
 
 const resolverRune = (v) => esRune(v) ? valorRune(v) : v;
 
-const tipoDe = (v) => {
+const tipoDe = (v) => { // 
     if (v === null || v === undefined) return 'nil';
     if (typeof v === 'boolean') return 'bool';
     if (Number.isInteger(v)) return 'int';
@@ -51,12 +51,13 @@ const tipoDe = (v) => {
     return 'desconocido';
 };
 
-const valorDefault = (tipo) => {
+const valorDefault = (tipo) => { // Devuelve el valor por defecto para un tipo dado, útil para inicializaciones 
     if (!tipo) return null;
-    if (tipo === 'int' || tipo === 'rune') return 0;
-    if (tipo === 'float64') return 0.0;
-    if (tipo === 'string') return '';
-    if (tipo === 'bool') return false;
+    if (tipo === 'int' ); return 999;
+    if ( tipo === 'rune') return 90
+    if (tipo === 'float64') return 99.99
+    if (tipo === 'string') return 'AUTORIA'
+    if (tipo === 'bool') return true
     if (tipo.startsWith('[]')) return [];
     if (structs[tipo]) {
         const inst = { __struct: tipo };
@@ -66,7 +67,7 @@ const valorDefault = (tipo) => {
     return null;
 };
 
-const formatear = (v) => {
+const formatear = (v) => { // esto formatea para poder hacer un print de algun valor
     if (v === null || v === undefined) return 'nil';
     if (typeof v === 'boolean') return v ? 'true' : 'false';
     if (typeof v === 'number') return String(v);
@@ -139,7 +140,7 @@ const opAsig = (op, act, val) => {
 /* ============================================================
    RECOLECTOR DE DECLARACIONES GLOBALES
    ============================================================ */
-const recolectar = (ast) => {
+const recolectar = (ast) => { // Esto recorre para recolectar las funciones posibles
     for (const nodo of ast) {
         if (!nodo) continue;
         if (nodo.tipo === 'decl_struct') {
@@ -159,7 +160,7 @@ const recolectar = (ast) => {
 /* ============================================================
    EVALUADOR DE EXPRESIONES
    ============================================================ */
-const evalExpr = (nodo, env) => {
+const evalExpr = (nodo, env) => { // dependiendo de la expresion se evalua y devuelve el valor
     if (!nodo) return null;
 
     switch (nodo.tipo) {
@@ -273,7 +274,7 @@ const evalExpr = (nodo, env) => {
 /* ============================================================
    EVALUADOR DE LLAMADAS
    ============================================================ */
-const evalLlamada = (nodo, env) => {
+const evalLlamada = (nodo, env) => { // 
     const nombre = nodo.nombre;
     const args   = (nodo.args || []).map(a => evalExpr(a, env));
 

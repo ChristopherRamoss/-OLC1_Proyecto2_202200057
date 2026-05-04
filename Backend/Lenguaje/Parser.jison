@@ -120,8 +120,8 @@
 %left       TIMES DIVIDE MOD
 %right      UMINUS NOT
 %left       INC DEC
-%left       LBRACKET RBRACKET
 %left       DOT
+%left       LBRACKET RBRACKET
 %left       LPAREN RPAREN
 
 %start programa
@@ -228,7 +228,31 @@ decl_variable
             });
             $$ = { tipo: 'decl_var', forma: 'implicita', nombre: $1, tipoDato: null, valor: $3 };
         }
+    | ID ID ASSIGN LBRACE nl_opt lista_campos_instancia COMMA nl_opt RBRACE
+        {
+            require('../Util/TablaSimbolos').listaSimbolos.push({
+                id: $2, tipoSimbolo: 'Variable', tipoDato: $1,
+                ambito: 'Local', linea: yylineno + 1, columna: @2.first_column
+            });
+            $$ = { tipo: 'decl_var', forma: 'struct_literal', tipoStruct: $1, nombre: $2, campos: $6 };
+        }
     | ID ID ASSIGN LBRACE nl_opt lista_campos_instancia nl_opt RBRACE
+        {
+            require('../Util/TablaSimbolos').listaSimbolos.push({
+                id: $2, tipoSimbolo: 'Variable', tipoDato: $1,
+                ambito: 'Local', linea: yylineno + 1, columna: @2.first_column
+            });
+            $$ = { tipo: 'decl_var', forma: 'struct_literal', tipoStruct: $1, nombre: $2, campos: $6 };
+        }
+    | ID ID DECL_ASSIGN LBRACE nl_opt lista_campos_instancia COMMA nl_opt RBRACE
+        {
+            require('../Util/TablaSimbolos').listaSimbolos.push({
+                id: $2, tipoSimbolo: 'Variable', tipoDato: $1,
+                ambito: 'Local', linea: yylineno + 1, columna: @2.first_column
+            });
+            $$ = { tipo: 'decl_var', forma: 'struct_literal', tipoStruct: $1, nombre: $2, campos: $6 };
+        }
+    | ID ID DECL_ASSIGN LBRACE nl_opt lista_campos_instancia nl_opt RBRACE
         {
             require('../Util/TablaSimbolos').listaSimbolos.push({
                 id: $2, tipoSimbolo: 'Variable', tipoDato: $1,
@@ -273,23 +297,6 @@ bloque
     : LBRACE sentencias RBRACE  { $$ = { tipo: 'bloque', cuerpo: $2 }; }
     ;
 
-/* FIX 1 y 3 — sentencias ahora incluye sentencia_con_bloque
-   que cubre if/else, for y switch SIN necesitar terminador
-   después del RBRACE de cierre. Esto resuelve el problema
-   de múltiples if consecutivos y for con if/else dentro:
-   
-   El problema raíz era:
-     sentencia_bloque : sentencia terminador
-   donde sentencia_if (que termina en RBRACE de bloque)
-   requería un NL/; después. Cuando había dos if seguidos,
-   el NL entre ellos era consumido como terminador del primero,
-   pero el siguiente NL antes del segundo if no existía o
-   confundía al parser.
-   
-   Solución: separar sentencias que terminan en RBRACE
-   (if, for, switch, bloque) de las que necesitan terminador
-   explícito. Las primeras van en sentencia_bloque directamente
-   sin pasar por `sentencia terminador`.                    */
 sentencias
     : sentencias sentencia_bloque  { if($2 !== null) $1.push($2); $$ = $1; }
     | /* vacío */                  { $$ = []; }
@@ -303,17 +310,19 @@ sentencia_bloque
     | decl_variable terminador             { $$ = $1; }
     | decl_constante terminador            { $$ = $1; }
     | asignacion terminador                { $$ = $1; }
+    | asignacion_indexada terminador       { $$ = $1; }
+    | asignacion_atributo terminador       { $$ = $1; }
     | sentencia_return terminador          { $$ = $1; }
     | sentencia_break terminador           { $$ = $1; }
     | sentencia_continue terminador        { $$ = $1; }
-    | ID INC terminador    { $$ = { tipo: 'inc', nombre: $1 }; }
-    | ID DEC terminador    { $$ = { tipo: 'dec', nombre: $1 }; }
+    | ID INC terminador                    { $$ = { tipo: 'inc', nombre: $1 }; }
+    | ID DEC terminador                    { $$ = { tipo: 'dec', nombre: $1 }; }
     | expresion terminador                 { $$ = $1; }
     | NL                                   { $$ = null; }
     | error terminador                     { $$ = null; }
     ;
 
-/* ── Asignaciones ────────────────────────────────────────── */
+/* ── Asignaciones simples (solo ID como lvalue) ──────────── */
 asignacion
     : ID ASSIGN expresion
         { $$ = { tipo: 'asignacion', nombre: $1, valor: $3 }; }
@@ -327,7 +336,11 @@ asignacion
         { $$ = { tipo: 'asignacion_op', op: '/=', nombre: $1, valor: $3 }; }
     | ID MOD_ASSIGN expresion
         { $$ = { tipo: 'asignacion_op', op: '%=', nombre: $1, valor: $3 }; }
-    | acceso_indexado ASSIGN expresion
+    ;
+
+/* ── Asignaciones con lvalue indexado ────────────────────── */
+asignacion_indexada
+    : acceso_indexado ASSIGN expresion
         { $$ = { tipo: 'asignacion_indice', acceso: $1, valor: $3 }; }
     | acceso_indexado PLUS_ASSIGN expresion
         { $$ = { tipo: 'asignacion_op_indice', op: '+=', acceso: $1, valor: $3 }; }
@@ -339,7 +352,11 @@ asignacion
         { $$ = { tipo: 'asignacion_op_indice', op: '/=', acceso: $1, valor: $3 }; }
     | acceso_indexado MOD_ASSIGN expresion
         { $$ = { tipo: 'asignacion_op_indice', op: '%=', acceso: $1, valor: $3 }; }
-    | acceso_atributo ASSIGN expresion
+    ;
+
+/* ── Asignaciones con lvalue de atributo ─────────────────── */
+asignacion_atributo
+    : acceso_atributo ASSIGN expresion
         { $$ = { tipo: 'asignacion_atributo', acceso: $1, valor: $3 }; }
     | acceso_atributo PLUS_ASSIGN expresion
         { $$ = { tipo: 'asignacion_op_atributo', op: '+=', acceso: $1, valor: $3 }; }
@@ -353,11 +370,7 @@ asignacion
         { $$ = { tipo: 'asignacion_op_atributo', op: '%=', acceso: $1, valor: $3 }; }
     ;
 
-/* ── IF / ELSE ───────────────────────────────────────────── */
-/* FIX 3 — sentencia_if ya no necesita terminador externo
-   porque sentencia_bloque la maneja directamente.
-   La cadena else if funciona porque sentencia_if puede
-   ser el sino de otro sentencia_if.                      */
+/* ── IF ─────────────────────────────────────────────────── */
 sentencia_if
     : IF expresion bloque
         { $$ = { tipo: 'if', condicion: $2, entonces: $3, sino: null }; }
@@ -368,9 +381,6 @@ sentencia_if
     ;
 
 /* ── FOR ─────────────────────────────────────────────────── */
-/* FIX 1 y 3 — sentencia_for tampoco necesita terminador
-   externo. El NL entre el } del for y la siguiente sentencia
-   es absorbido por sentencia_bloque : NL.                */
 sentencia_for
     : FOR expresion bloque
         { $$ = { tipo: 'for_while', condicion: $2, cuerpo: $3 }; }
@@ -383,36 +393,26 @@ sentencia_for
     ;
 
 sentencia_for_init
-    : decl_variable   { $$ = $1; }
-    | asignacion      { $$ = $1; }
-    | /* vacío */     { $$ = null; }
+    : decl_variable        { $$ = $1; }
+    | asignacion           { $$ = $1; }
+    | asignacion_indexada  { $$ = $1; }
+    | asignacion_atributo  { $$ = $1; }
+    | /* vacío */          { $$ = null; }
     ;
 
 sentencia_for_post
-    : asignacion      { $$ = $1; }
-    | ID INC          { $$ = { tipo: 'inc', nombre: $1 }; }
-    | ID DEC          { $$ = { tipo: 'dec', nombre: $1 }; }
-    | /* vacío */     { $$ = null; }
+    : asignacion           { $$ = $1; }
+    | asignacion_indexada  { $$ = $1; }
+    | asignacion_atributo  { $$ = $1; }
+    | ID INC               { $$ = { tipo: 'inc', nombre: $1 }; }
+    | ID DEC               { $$ = { tipo: 'dec', nombre: $1 }; }
+    | /* vacío */          { $$ = null; }
     ;
 
 /* ── SWITCH ──────────────────────────────────────────────── */
-/* FIX 4 — sentencia_switch tampoco necesita terminador
-   externo (termina en RBRACE).
-   
-   caso_switch ahora NO usa nl_opt después del COLON —
-   el NL tras `case 'A':` es consumido por sentencias_case
-   como sentencia_bloque_case : NL.
-   
-   FIX 4 específico para `case 'A':`: el problema era que
-   LIT_RUNE como expresión en CASE requiere que el parser
-   reduzca LIT_RUNE -> expresion antes del COLON.
-   Las reglas de precedencia y la gramática ya lo permiten,
-   pero la separación de sentencias_case con su propio
-   sentencia_bloque_case (sin error terminador) asegura
-   que CASE y DEFAULT sean tokens de corte correctos.    */
 sentencia_switch
     : SWITCH expresion LBRACE nl_opt lista_cases RBRACE
-        { $$ = { tipo: 'switch', expresion: $2, casos: $4 }; }
+        { $$ = { tipo: 'switch', expresion: $2, casos: $5 }; }
     ;
 
 lista_cases
@@ -427,29 +427,26 @@ caso_switch
         { $$ = { tipo: 'default', cuerpo: $3 }; }
     ;
 
-/* sentencias_case: no tiene `error terminador` para que
-   CASE, DEFAULT y RBRACE sean tokens de corte naturales. */
 sentencias_case
     : sentencias_case sentencia_bloque_case  { if($2 !== null) $1.push($2); $$ = $1; }
     | /* vacío */                            { $$ = []; }
     ;
 
-/* FIX 4 — sentencia_bloque_case también separa sentencias
-   que terminan en } de las que necesitan terminador,
-   igual que sentencia_bloque principal.                  */
 sentencia_bloque_case
-    : sentencia_if               { $$ = $1; }
-    | sentencia_for              { $$ = $1; }
-    | sentencia_switch           { $$ = $1; }
-    | bloque                     { $$ = $1; }
-    | decl_variable terminador   { $$ = $1; }
-    | decl_constante terminador  { $$ = $1; }
-    | asignacion terminador      { $$ = $1; }
-    | sentencia_return terminador { $$ = $1; }
-    | sentencia_break terminador  { $$ = $1; }
-    | sentencia_continue terminador { $$ = $1; }
-    | expresion terminador       { $$ = $1; }
-    | NL                         { $$ = null; }
+    : sentencia_if                          { $$ = $1; }
+    | sentencia_for                         { $$ = $1; }
+    | sentencia_switch                      { $$ = $1; }
+    | bloque                                { $$ = $1; }
+    | decl_variable terminador              { $$ = $1; }
+    | decl_constante terminador             { $$ = $1; }
+    | asignacion terminador                 { $$ = $1; }
+    | asignacion_indexada terminador        { $$ = $1; }
+    | asignacion_atributo terminador        { $$ = $1; }
+    | sentencia_return terminador           { $$ = $1; }
+    | sentencia_break terminador            { $$ = $1; }
+    | sentencia_continue terminador         { $$ = $1; }
+    | expresion terminador                  { $$ = $1; }
+    | NL                                    { $$ = null; }
     ;
 
 /* ── Sentencias de control ───────────────────────────────── */
@@ -533,10 +530,10 @@ expresion
     | NOT expresion
         { $$ = { tipo: 'op_unario', op: '!', operando: $2 }; }
     | LPAREN expresion RPAREN  { $$ = $2; }
-    | llamada_funcion
-    | acceso_indexado   { $$ = $1; }
-    | acceso_atributo   { $$ = $1; }
-    | literal_slice     { $$ = $1; }
+    | llamada_funcion          { $$ = $1; }
+    | acceso_indexado          { $$ = $1; }
+    | acceso_atributo          { $$ = $1; }
+    | literal_slice            { $$ = $1; }
     | LIT_INT     { $$ = { tipo: 'lit_int',    valor: parseInt($1, 10) }; }
     | LIT_FLOAT   { $$ = { tipo: 'lit_float',  valor: parseFloat($1) }; }
     | LIT_STRING  { $$ = { tipo: 'lit_string', valor: $1 }; }
@@ -565,21 +562,16 @@ acceso_atributo
         { $$ = { tipo: 'acceso_atributo', objeto: $1, campo: $3 }; }
     | acceso_atributo DOT ID
         { $$ = { tipo: 'acceso_atributo', objeto: $1, campo: $3 }; }
+    | llamada_funcion DOT ID
+        { $$ = { tipo: 'acceso_atributo', objeto: $1, campo: $3 }; }
     ;
 
-/* ── Literales de slice ──────────────────────────────────── */
-/* FIX 2 — lista_elementos_slice usa COMMA nl_opt para
-   absorber los NL después de cada coma en la declaración
-   multilínea de slice 2D:
-       [][]int{
-           {1,2,3},   <- NL después de la coma es absorbido
-           {4,5,6},
-       }
-   elemento_slice acepta tanto filas {expr,...} como
-   expresiones simples, unificando 1D y 2D.            */
+/* ── Literales de slice ─────────────────────────────────── */
 literal_slice
-    : LBRACKET RBRACKET tipo LBRACE nl_opt lista_elementos_slice nl_opt RBRACE
-        { $$ = { tipo: 'lit_slice', tipoDato: $3, elementos: $5 }; }
+    : LBRACKET RBRACKET tipo LBRACE nl_opt lista_elementos_slice COMMA nl_opt RBRACE
+        { $$ = { tipo: 'lit_slice', tipoDato: $3, elementos: $6 }; }
+    | LBRACKET RBRACKET tipo LBRACE nl_opt lista_elementos_slice nl_opt RBRACE
+        { $$ = { tipo: 'lit_slice', tipoDato: $3, elementos: $6 }; }
     | LBRACKET RBRACKET tipo LBRACE nl_opt RBRACE
         { $$ = { tipo: 'lit_slice', tipoDato: $3, elementos: [] }; }
     ;

@@ -2,6 +2,15 @@ const parser = require('../Lenguaje/Parser');
 const { limpiarErrores, listaErrores } = require('../Util/Errores');
 const { generarHTMLReporte } = require('../Util/Reportes');
 
+
+/* ============================================================
+  El Analizador.js funciona como un controlador en una arquitectura MVC. 
+  Se encarga de recibir el flujo de datos desde el cliente, invocar el proceso 
+  de parsing de Jison, ejecutar el patrón intérprete sobre el AST resultante y 
+  finalmente retornar la respuesta procesada al frontend
+   ============================================================ */
+
+
 export const procesarEntrada = (codigo) => {
     limpiarErrores(); // Limpiar errores de ejecuciones anteriores
     

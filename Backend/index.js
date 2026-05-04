@@ -1,4 +1,7 @@
-// index.js
+/* ── POST /analizar ────────────────────────────────────────
+El archivo index.js es un servidor de servicios web utilizando Express
+recibe el código fuente, gestiona el ciclo de vida del AST y expone los resultados a través de diferentes rutas
+   ──────────────────────────────────────────────────────── */
 const express = require('express');
 const cors    = require('cors');
 
@@ -21,7 +24,7 @@ let ultimoAST = null;
    ──────────────────────────────────────────────────────── */
 // cambios
 // cambios
-app.post('/analizar', (req, res) => {
+app.post('/analizar', (req, res) => {   // Recibimos el código fuente desde el frontend y funciona con el boton ejecutar
     const { codigo } = req.body;
 
     // 1. Limpieza total de estados
@@ -39,7 +42,7 @@ app.post('/analizar', (req, res) => {
     } catch (e) {
         // SI FALLA EL PARSER:
         console.error("--- ERROR DE PARSEO ---");
-        console.error(e.message); // Esto te dirá la línea exacta del error en tu consola de Node
+        console.error(e.message); // Esto dirá la línea exacta del error en tu consola de Node
 
         // Devolvemos un 400 (Bad Request) para que el Frontend sepa que falló la sintaxis
         return res.status(400).json({ 

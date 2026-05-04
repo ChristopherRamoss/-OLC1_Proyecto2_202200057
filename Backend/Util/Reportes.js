@@ -1,3 +1,8 @@
+/* ============================================================
+Logica para crear un HTML de los reportes tanto de simbolos
+Como de reporte de errores
+   ============================================================ */
+
 const generarHTMLReporte = (tipo, datos) => {
     const listaSimbolos = [];
     const esError = tipo === 'ERRORES';

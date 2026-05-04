@@ -1,10 +1,14 @@
-// Util/GeneradorAST.js
+/* ============================================================
+El GeneradorAST implementa un recorrido recursivo sobre el árbol de sintaxis, 
+traduciendo cada objeto y propiedad a una gramática DOT. Su propósito es 
+facilitar la depuración y cumplir con el reporte visual del AST
+   ============================================================ */
+
 let cuerpoDot = "";
 let contador = 0;
 
-const generarDOT = (ast) => {
+const generarDOT = (ast) => { // Reiniciar variables globales para cada generación
     cuerpoDot = "digraph AST {\n";
-    // Configuración estética para que se parezca a tu imagen
     cuerpoDot += '  nodesep=0.5; ranksep=0.5;\n';
     cuerpoDot += '  node [shape=box, fontname="Arial", style="filled", fillcolor="#f9f9f9"];\n';
     cuerpoDot += '  edge [color="#cccccc"];\n';
@@ -19,7 +23,7 @@ const generarDOT = (ast) => {
     return cuerpoDot;
 };
 
-const recorrer = (nodo, padreId) => {
+const recorrer = (nodo, padreId) => { 
     if (nodo === null || nodo === undefined) return;
 
     // Si es un arreglo (lista de instrucciones)
